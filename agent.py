@@ -31,9 +31,7 @@ alpha = 0.3
 # discount rate 
 gamma = 0.9
 
-episodes = 10
-
-
+EPISODES = 10
 
 def display():
     env_screen = env.render()
@@ -47,12 +45,11 @@ def discretize(s):
     if np.issubdtype(s[0], int):
         return s
     s_adjusted = (s - env.observation_space.low)*np.array([10, 100])
-
     return np.round(s_adjusted, 0).astype(int)
 
 
 epsilon = 0.5
-reduction = epsilon/episodes
+reduction = epsilon/EPISODES
 def epsilonGreedy(s):
     global epsilon, reduction
     if np.random.random() < 1-epsilon:
@@ -85,14 +82,13 @@ def QLearningAgent(current_state, current_reward, done):
     a = epsilonGreedy(s)
     s = current_state
     r = current_reward
-    
+
     return a
 
 
-
-obs = env.reset()[0]
+obs, _ = env.reset()
 done = False
-for step in range(episodes):
+for step in range(EPISODES):
     i=0
     while not done:
         i+=1
@@ -107,7 +103,7 @@ for step in range(episodes):
         # If the epsiode is up, then start another one
         if done:
             print(i)
-            print("Episode {} done".format(episodes))
+            print("Episode {} done".format(EPISODES))
             env.reset()
         if truncated:
             print("Failed - start again")

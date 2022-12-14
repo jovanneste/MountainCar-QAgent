@@ -47,10 +47,10 @@ N = np.zeros(((num_states[0], num_states[1], env.action_space.n)))
 # previous state, action and reward
 s,a,r = None, None, 0
 
-alpha, gamma = 0.2, 0.9
+alpha, gamma = 0.3, 0.9
 episodes = 10
 
-epsilon = 0.8
+epsilon = 0.5
 min_epsilon = 0
 global reduction 
 reduction = (epsilon - min_epsilon)/episodes
@@ -82,7 +82,8 @@ def QLearningAgent(current_state, current_reward, done):
         # update Q table 
         delta = alpha*(r + (gamma * np.max(Q[current_state[0], current_state[1]])) - Q[s[0], s[1],a])
         Q[s[0], s[1], a] += delta
-        
+    
+    # use some exploration function to get next action
     a = epsilonGreedy(s)
     s = current_state
     r = current_reward

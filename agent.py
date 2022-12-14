@@ -29,8 +29,6 @@ def discretize(s):
     return np.round(s_adjusted, 0).astype(int)
 
 
-def randomAgent(o,r):
-    return env.action_space.sample()
 
 # persistents - q table, frequencies  
 global Q

@@ -22,11 +22,43 @@ print("Upper Bound for Env Observation", env.observation_space.high)
 print("Lower Bound for Env Observation", env.observation_space.low)
 print("The action space: {}".format(env.action_space.n))
 
+def discretesize(s):
+    s_adjusted = (s - env.observation_space.low)*np.array([10, 100])
+    return np.round(s_adjusted, 0).astype(int)
+
+    
+
 def randomAgent():
     return env.action_space.sample()
 
+# persistents - q table, frequencies  
+global Q
+global N
+global s,a,r
+global terminal 
 
-    
+num_states = (env.observation_space.high - env.observation_space.low)*np.array([10, 100])
+num_states = np.round(num_states, 0).astype(int) + 1
+
+# maybe initialise to q table to zeros 
+Q = np.random.uniform(low=-1, high=1, size = (num_states[0], num_states[1], env.action_space.n))
+N = np.zeros(((num_states[0], num_states[1], env.action_space.n)))
+# previous state, action and reward
+s,a,r = None, None, None
+terminal = False
+
+#def QLearningAgent(current_state, current_reward):
+obs = env.reset()
+a = env.action_space.sample()
+obs, reward, done, truncated, info = env.step(a)
+
+print(obs)
+
+print(discretesize(obs))
+
+print()
+
+print()
 
 episodes = 0
 obs = env.reset()

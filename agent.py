@@ -7,17 +7,39 @@ Created on Tue Dec 13 11:37:35 2022
 """
 
 import gym
+env = gym.make('MountainCar-v0', render_mode='human')
 import matplotlib.pyplot as plt 
 import time 
 import numpy as np
+
+
+# persistents - q table, frequencies, prev state, action and reward
+global Q
+global N
+global s,a,r
+
+num_states = (env.observation_space.high - env.observation_space.low)*np.array([10, 100])
+num_states = np.round(num_states, 0).astype(int) + 1
+
+Q = np.random.uniform(low=0, high=1, size = (num_states[0], num_states[1], env.action_space.n))
+N = np.zeros(((num_states[0], num_states[1], env.action_space.n)))
+# previous state, action and reward
+s,a,r = None, None, 0
+
+# learning rate
+alpha = 0.3
+# discount rate 
+gamma = 0.9
+
+episodes = 10
+
+
 
 def display():
     env_screen = env.render()
     env.close()
     plt.imshow(env_screen)
     
-env = gym.make('MountainCar-v0', render_mode='human')
-
 
 def discretize(s):
     if s is None:
@@ -29,30 +51,8 @@ def discretize(s):
     return np.round(s_adjusted, 0).astype(int)
 
 
-
-# persistents - q table, frequencies  
-global Q
-global N
-global s,a,r
-
-num_states = (env.observation_space.high - env.observation_space.low)*np.array([10, 100])
-num_states = np.round(num_states, 0).astype(int) + 1
-
-# maybe initialise to q table to zeros 
-Q = np.random.uniform(low=0, high=1, size = (num_states[0], num_states[1], env.action_space.n))
-
-N = np.zeros(((num_states[0], num_states[1], env.action_space.n)))
-# previous state, action and reward
-s,a,r = None, None, 0
-
-alpha, gamma = 0.3, 0.9
-episodes = 10
-
 epsilon = 0.5
-min_epsilon = 0
-global reduction 
-reduction = (epsilon - min_epsilon)/episodes
-
+reduction = epsilon/episodes
 def epsilonGreedy(s):
     global epsilon, reduction
     if np.random.random() < 1-epsilon:
@@ -60,7 +60,7 @@ def epsilonGreedy(s):
     else:
         action = np.random.randint(0, env.action_space.n)
     
-    if epsilon>min_epsilon:
+    if epsilon>0:
         epsilon-=reduction
         
     return action
@@ -88,7 +88,7 @@ def QLearningAgent(current_state, current_reward, done):
     
     return a
 
-    
+
 
 obs = env.reset()[0]
 done = False

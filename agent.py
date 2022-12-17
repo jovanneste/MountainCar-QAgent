@@ -29,9 +29,9 @@ s,a,r = None, None, 0
 # learning rate
 alpha = 0.2
 # discount rate 
-gamma = 0.7
+gamma = 0.8
 
-EPISODES = 10
+EPISODES = 1000
 
 def display():
     env_screen = env.render()
@@ -99,7 +99,7 @@ for step in range(EPISODES):
         action = QLearningAgent(obs, r, done)
         obs, r, done, truncated, info = env.step(action)
         total_reward += r
-        #env.render()
+        env.render()
         time.sleep(0.001)
         
         

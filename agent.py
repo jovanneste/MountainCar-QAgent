@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import time 
 import numpy as np
 
-
 # persistents - q table, frequencies, prev state, action and reward
 global Q
 global N
@@ -21,15 +20,16 @@ global s,a,r
 num_states = (env.observation_space.high - env.observation_space.low)*np.array([10, 100])
 num_states = np.round(num_states, 0).astype(int) + 1
 
-Q = np.random.uniform(low=0, high=1, size = (num_states[0], num_states[1], env.action_space.n))
+# Q table and frequency table used for some exploration functions
+Q = np.random.uniform(low=-1, high=1, size = (num_states[0], num_states[1], env.action_space.n))
 N = np.zeros(((num_states[0], num_states[1], env.action_space.n)))
 # previous state, action and reward
 s,a,r = None, None, 0
 
 # learning rate
-alpha = 0.3
+alpha = 0.2
 # discount rate 
-gamma = 0.9
+gamma = 0.7
 
 EPISODES = 10
 
@@ -48,7 +48,7 @@ def discretize(s):
     return np.round(s_adjusted, 0).astype(int)
 
 
-epsilon = 0.5
+epsilon = 0.6
 reduction = epsilon/EPISODES
 def epsilonGreedy(s):
     global epsilon, reduction
@@ -87,28 +87,40 @@ def QLearningAgent(current_state, current_reward, done):
 
 
 obs, _ = env.reset()
-done = False
+all_rewards = []
 for step in range(EPISODES):
+    done = False
+    print("Episode:", step)
     i=0
+    total_reward = 0
     while not done:
         i+=1
-        if i%100==0:
-            print(i)
+        
         action = QLearningAgent(obs, r, done)
         obs, r, done, truncated, info = env.step(action)
-
-        env.render()
+        total_reward += r
+        #env.render()
         time.sleep(0.001)
         
-        # If the epsiode is up, then start another one
+        
         if done:
             print(i)
-            print("Episode {} done".format(EPISODES))
+            print("Episode {} done".format(step))
+            all_rewards.append(total_reward)
+            total_reward = 0
             env.reset()
-        if truncated:
-            print("Failed - start again")
-            env.reset()
+ #       if truncated:
+ #           print("Failed - start again")
+ #           print("Total reward: ", total_reward)
+ #           all_rewards.append(total_reward)
+ #           total_reward = 0
+ #           env.reset()
+   
             
        
 # Close the env
 env.close()
+
+print(all_rewards)
+plt.plot([i for i in range(EPISODES)], all_rewards)
+plt.show()
